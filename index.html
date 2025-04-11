@@ -20,25 +20,31 @@
     zoom: 13,
   });
 
-  const response = await fetch('/.netlify/functions/getBuns');
-  const buns = await response.json();
+  try {
+    const response = await fetch('/.netlify/functions/getBuns');
+    const buns = await response.json();
+    console.log("Fetched buns:", buns);
 
-  for (const bun of buns) {
-    if (!bun.lat || !bun.lng) continue; // skip if no coordinates
+    for (const bun of buns) {
+      console.log("Trying pin:", bun.title, bun.lat, bun.lng);
+      if (!bun.lat || !bun.lng) continue;
 
-    const marker = new google.maps.Marker({
-      map: map,
-      position: { lat: bun.lat, lng: bun.lng },
-      title: bun.title,
-    });
+      const marker = new google.maps.Marker({
+        map: map,
+        position: { lat: bun.lat, lng: bun.lng },
+        title: bun.title,
+      });
 
-    const infoWindow = new google.maps.InfoWindow({
-      content: `<h3>${bun.title}</h3><p>${bun.note || "No notes yet"}</p>`,
-    });
+      const infoWindow = new google.maps.InfoWindow({
+        content: `<h3>${bun.title}</h3><p>${bun.note || "No notes yet"}</p>`,
+      });
 
-    marker.addListener("click", () => {
-      infoWindow.open(map, marker);
-    });
+      marker.addListener("click", () => {
+        infoWindow.open(map, marker);
+      });
+    }
+  } catch (error) {
+    console.error("Failed to fetch buns or drop pins:", error);
   }
 }
     </script>
