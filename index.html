@@ -14,42 +14,43 @@
     <div id="map"></div>
 
     <script>
-      // This function initializes the map
-      function initMap() {
+      async function initMap() {
         const map = new google.maps.Map(document.getElementById("map"), {
-          zoom: 12,
-          center: { lat: 40.7100, lng: -73.9650 }, // Centered between LES & Williamsburg
+          center: { lat: 40.7100, lng: -73.9650 }, // NY-focused center
+          zoom: 13,
         });
-
-        const places = [
-          {
-            location: { lat: 48.8566, lng: 2.3522 },
-            title: "Paris",
-            note: "My favorite croissant!",
-          },
-          {
-            location: { lat: 40.7128, lng: -74.006 },
-            title: "New York",
-            note: "Where I live",
-          },
-        ];
-
-        // Loop through each place and add a marker
-        places.forEach((place) => {
-          const marker = new google.maps.Marker({
-            position: place.location,
-            map: map,
-            title: place.title,
+    
+        // 1. Fetch buns from your Netlify function
+        const response = await fetch('/.netlify/functions/getBuns');
+        const buns = await response.json();
+    
+        // 2. Create a Google Maps geocoder
+        const geocoder = new google.maps.Geocoder();
+    
+        // 3. Loop through buns and drop pins
+        for (const bun of buns) {
+          if (!bun.location) continue; // skip if no location
+    
+          geocoder.geocode({ address: bun.location }, (results, status) => {
+            if (status === "OK" && results[0]) {
+              const marker = new google.maps.Marker({
+                map: map,
+                position: results[0].geometry.location,
+                title: bun.title,
+              });
+    
+              const infoWindow = new google.maps.InfoWindow({
+                content: `<h3>${bun.title}</h3><p>${bun.note || "No notes yet"}</p>`,
+              });
+    
+              marker.addListener("click", () => {
+                infoWindow.open(map, marker);
+              });
+            } else {
+              console.warn(`Geocoding failed for "${bun.title}" at "${bun.location}"`);
+            }
           });
-
-          const infoWindow = new google.maps.InfoWindow({
-            content: `<h3>${place.title}</h3><p>${place.note}</p>`,
-          });
-
-          marker.addListener("click", () => {
-            infoWindow.open(map, marker);
-          });
-        });
+        }
       }
     </script>
 
