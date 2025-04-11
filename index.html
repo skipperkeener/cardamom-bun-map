@@ -15,43 +15,32 @@
 
     <script>
       async function initMap() {
-        const map = new google.maps.Map(document.getElementById("map"), {
-          center: { lat: 40.7100, lng: -73.9650 }, // NY-focused center
-          zoom: 13,
-        });
-    
-        // 1. Fetch buns from your Netlify function
-        const response = await fetch('/.netlify/functions/getBuns');
-        const buns = await response.json();
-    
-        // 2. Create a Google Maps geocoder
-        const geocoder = new google.maps.Geocoder();
-    
-        // 3. Loop through buns and drop pins
-        for (const bun of buns) {
-          if (!bun.location) continue; // skip if no location
-    
-          geocoder.geocode({ address: bun.location }, (results, status) => {
-            if (status === "OK" && results[0]) {
-              const marker = new google.maps.Marker({
-                map: map,
-                position: results[0].geometry.location,
-                title: bun.title,
-              });
-    
-              const infoWindow = new google.maps.InfoWindow({
-                content: `<h3>${bun.title}</h3><p>${bun.note || "No notes yet"}</p>`,
-              });
-    
-              marker.addListener("click", () => {
-                infoWindow.open(map, marker);
-              });
-            } else {
-              console.warn(`Geocoding failed for "${bun.title}" at "${bun.location}"`);
-            }
-          });
-        }
-      }
+  const map = new google.maps.Map(document.getElementById("map"), {
+    center: { lat: 40.7100, lng: -73.9650 },
+    zoom: 13,
+  });
+
+  const response = await fetch('/.netlify/functions/getBuns');
+  const buns = await response.json();
+
+  for (const bun of buns) {
+    if (!bun.lat || !bun.lng) continue; // skip if no coordinates
+
+    const marker = new google.maps.Marker({
+      map: map,
+      position: { lat: bun.lat, lng: bun.lng },
+      title: bun.title,
+    });
+
+    const infoWindow = new google.maps.InfoWindow({
+      content: `<h3>${bun.title}</h3><p>${bun.note || "No notes yet"}</p>`,
+    });
+
+    marker.addListener("click", () => {
+      infoWindow.open(map, marker);
+    });
+  }
+}
     </script>
 
     <!-- Load the Google Maps script -->
