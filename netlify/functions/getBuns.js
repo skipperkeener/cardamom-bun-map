@@ -12,7 +12,7 @@ exports.handler = async function(event, context) {
 
     const results = response.results.map(page => {
       const title = page.properties.Name.title[0]?.plain_text || "Untitled";
-      const location = page.properties.Location.rich_text[0]?.plain_text || "";
+      const location = page.properties.Location.rich_text.map(rt => rt.plain_text).join(" ") || "";
       const note = page.properties.Review.rich_text[0]?.plain_text || "";
 
       return { title, location, note };
