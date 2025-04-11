@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Places I’ve Visited</title>
+    <style>
+      /* Style to make the map fill most of the page */
+      #map {
+        height: 90vh;
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+
+    <script>
+      // This function initializes the map
+      function initMap() {
+        const map = new google.maps.Map(document.getElementById("map"), {
+          zoom: 8,
+          center: { lat: 40.7128, lng: -74.0060 }, // Centered on New York
+        });
+
+        const places = [
+          {
+            location: { lat: 48.8566, lng: 2.3522 },
+            title: "Paris",
+            note: "My favorite croissant!",
+          },
+          {
+            location: { lat: 40.7128, lng: -74.006 },
+            title: "New York",
+            note: "Where I live",
+          },
+        ];
+
+        // Loop through each place and add a marker
+        places.forEach((place) => {
+          const marker = new google.maps.Marker({
+            position: place.location,
+            map: map,
+            title: place.title,
+          });
+
+          const infoWindow = new google.maps.InfoWindow({
+            content: `<h3>${place.title}</h3><p>${place.note}</p>`,
+          });
+
+          marker.addListener("click", () => {
+            infoWindow.open(map, marker);
+          });
+        });
+      }
+    </script>
+
+    <!-- Load the Google Maps script -->
+    <script async
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDK7AJ9hCQHBW6HQANAYj3Maknxn8zbcJY&callback=initMap">
+    </script>
+  </body>
+</html>
