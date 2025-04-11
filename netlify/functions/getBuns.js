@@ -13,8 +13,8 @@ exports.handler = async function(event, context) {
     const results = response.results.map(page => {
         const title = page.properties.Name?.title[0]?.plain_text || "";
         const note = page.properties.Review?.rich_text[0]?.plain_text || "";
-        const lat = page.properties.Latitude?.number;
-        const lng = page.properties.Longitude?.number;
+        const lat = page.properties["Latitude"]?.number;
+        const lng = page.properties["Longitude"]?.number;
         
         return { title, note, lat, lng };
     });
